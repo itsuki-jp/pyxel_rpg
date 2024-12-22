@@ -61,9 +61,7 @@ class App:
         return 0 <= x < len(self.map[0]) and 0 <= y < len(self.map)
 
     def is_get_item(self, x, y):
-        if self.map[y][x] == ITEM:
-            self.map[y][x] = GRASS
-            return True
+        return self.map[y][x] == ITEM
 
     ##############
     # Draw logic #
@@ -98,7 +96,7 @@ class App:
                     11,
                     4,
                     5,
-                    14,
+                    11,
                 ][tile]
                 pyxel.rect(
                     (x + start_x - self.x + pyxel.width // (2 * BLOCK_SIZE))
