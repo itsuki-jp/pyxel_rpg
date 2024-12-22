@@ -4,6 +4,7 @@ from random import randint, random
 GRASS = 0
 STONE = 1
 SEA = 2
+ITEM = 3
 BLOCK_SIZE = 5
 
 
@@ -12,9 +13,14 @@ class App:
         pyxel.init(120, 120)
         self.x = 50
         self.y = 50
+        self.item_count = 0
         self.map = [
             [
-                STONE if j < 50 or j >= 100 else GRASS if random() < 0.7 else STONE
+                (
+                    SEA
+                    if j < 50 or j >= 100
+                    else GRASS if random() < 0.7 else STONE if random() < 0.9 else ITEM
+                )
                 for j in range(150)
             ]
             for i in range(150)
@@ -33,19 +39,31 @@ class App:
 
         if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_DPAD_LEFT):
             new_x -= 1
-        if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT):
+        elif pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(
+            pyxel.GAMEPAD1_BUTTON_DPAD_RIGHT
+        ):
             new_x += 1
-        if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
+        elif pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_DPAD_UP):
             new_y -= 1
-        if pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
+        elif pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_DPAD_DOWN):
             new_y += 1
-
+        else:
+            return
         if self.is_inside_map(new_x, new_y) and self.map[new_y][new_x] != STONE:
             self.x = new_x
             self.y = new_y
+            print("hogehoge!")
+
+            if self.is_get_item(new_x, new_y):
+                self.item_count += 1
 
     def is_inside_map(self, x, y):
         return 0 <= x < len(self.map[0]) and 0 <= y < len(self.map)
+
+    def is_get_item(self, x, y):
+        if self.map[y][x] == ITEM:
+            self.map[y][x] = GRASS
+            return True
 
     ##############
     # Draw logic #
@@ -54,6 +72,7 @@ class App:
         pyxel.cls(0)
         self.draw_map()
         self.draw_player()
+        self.draw_text(x=0, y=0, text=f"Item: {self.item_count}")
 
     def draw_player(self):
         pyxel.rect(
@@ -61,8 +80,11 @@ class App:
             pyxel.height // 2,
             BLOCK_SIZE,
             BLOCK_SIZE,
-            9,
+            0,
         )
+
+    def draw_text(self, x, y, text):
+        pyxel.text(x, y, text, 1)
 
     def draw_map(self):
         start_x = max(self.x - pyxel.width // (2 * BLOCK_SIZE), 0)
@@ -72,7 +94,12 @@ class App:
 
         for y, row in enumerate(self.map[start_y:end_y]):
             for x, tile in enumerate(row[start_x:end_x]):
-                color = [pyxel.COLOR_GREEN, pyxel.COLOR_GRAY][tile]
+                color = [
+                    11,
+                    4,
+                    5,
+                    14,
+                ][tile]
                 pyxel.rect(
                     (x + start_x - self.x + pyxel.width // (2 * BLOCK_SIZE))
                     * BLOCK_SIZE,
