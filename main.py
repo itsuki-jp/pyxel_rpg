@@ -16,11 +16,7 @@ class App:
         self.item_count = 0
         self.map = [
             [
-                (
-                    SEA
-                    if j < 50 or j >= 100
-                    else GRASS if random() < 0.7 else STONE if random() < 0.9 else ITEM
-                )
+                (GRASS if random() < 0.7 else STONE if random() < 0.9 else ITEM)
                 for j in range(150)
             ]
             for i in range(150)
